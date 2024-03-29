@@ -27,8 +27,43 @@ def create_connection(db_file):
         print(e)
 
     return conn
+def competitions_specific_month(conn):
+    month = input("Enter a month (value from 1-12): ")
+    date = "2024-{}-01".format(month)
+    with conn:
+        
+        cur = conn.cursor()
+        month_query = """ 
+        SELECT competition_ID, title FROM Grants
+        WHERE app_deadline > "{}"
+        AND EXISTS (
+            SELECT 1 FROM Grant_Proposals
+            WHERE Grant_Proposals.competition_ID = Grants.competition_ID
+            AND (
+                Grant_Proposals.requested_amount > 20000 OR
+                (SELECT 1 FROM Collaborators WHERE Collaborators.grant_proposal_ID = Grant_Proposals.grant_proposal_ID) > 10
+            )
+        )
+        """.format(date)
+        try: 
+            cur.execute(month_query)
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print("Error retrieving records for the specified month :( ")
+            
+        
+    return
+    
+    
 
 def main():
-    database = "\council.db"
+    database = "council.db"
 
     conn = create_connection(database)
+    competitions_specific_month(conn)
+    
+
+if __name__ == "__main__":
+    main()
