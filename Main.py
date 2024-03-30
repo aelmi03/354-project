@@ -99,11 +99,30 @@ def user_specified_date(conn):
         except Error as e:
             print("Error retrieving records for the specified date :( ")
 
+def average_discrepancy(conn):
+    area = input("Enter an area:")
+    with conn:
+        cur = conn.cursor()
+        discrepancy_query = """
+            SELECT AVG(Grant_Proposals.requested_amount - Grant_Proposals.amount_awarded) FROM Grant_Proposals 
+            JOIN Awarded ON Grant_Proposals.grant_proposal_ID = Awarded.grant_proposal_ID JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
+            WHERE Grants.topic = "{}"
+        """.format(area)
+        try:
+            cur.execute(discrepancy_query)
+            rows = cur.fetchall()  
+            if(rows[0][0]) is None:
+                return 
+            for row in rows:
+                print(row)
+        except Error as e: 
+            print("Error retrieving records for the specified area :( ")
+
 def main():
     database = "council.db"
 
     conn = create_connection(database)
-    user_specified_date(conn)
+    average_discrepancy(conn)
 
 if __name__ == "__main__":
     main()
