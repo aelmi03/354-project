@@ -27,6 +27,7 @@ def create_connection(db_file):
         print(e)
 
     return conn
+
 def competitions_specific_month(conn):
     month = input("Enter a month (value from 1-12): ")
     date = "2024-{}-01".format(month)
@@ -51,9 +52,7 @@ def competitions_specific_month(conn):
             for row in rows:
                 print(row)
         except Error as e:
-            print("Error retrieving records for the specified month :( ")
-            
-        
+            print("Error retrieving records for the specified month :( ") 
     
     
 def user_specified_area(conn):
@@ -143,6 +142,31 @@ def main():
 
     conn = create_connection(database)
     proposals_by_name(conn)
+
+    x = 10
+    while x != 0:
+        print("0: Quit")
+        print("1: Find the proposals that request the largest amount of money")
+        print("2: Find the proposals submitted before the date that are awarded the largest amount of money")
+        print("3: Find the average requested/awarded discrepancy")
+        print("4: Find the proposals that need to be reviewed with a given name")
+        print("5: Find all open competitions that have at least one large submitted proposal(20,000 or more requested)")
+        print("6: Reviewer Assignment")
+
+        x = input("Please enter the number of the option you want to go to:")
+        if x > 6:
+            x = input("Sorry that is an invalid number, please input a valid number")
+
+        match x:
+            case 1: 
+                user_specified_area(conn)
+            case 2:
+                user_specified_date(conn)
+            case 3:
+                average_discrepancy(conn)
+
+
+
 
 if __name__ == "__main__":
     main()
