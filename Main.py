@@ -76,11 +76,34 @@ def user_specified_area(conn):
         except Error as e:
             print("Error retrieving records for the specified area :( ")
 
+def user_specified_date(conn):
+    date = input("Enter a date (YYYY-MM-DD): ")
+    with conn:
+        cur = conn.cursor()
+        # 
+        date_query = """ 
+        SELECT * FROM Grant_Proposals JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID 
+        JOIN Awarded ON Grant_Proposals.grant_proposal_ID = Awarded.grant_proposal_ID 
+        WHERE Grants.app_deadline < "{}"  AND
+        NOT EXISTS (
+            SELECT 1 FROM Grant_Proposals GP_2 JOIN Grants Grants2 ON GP_2.competition_ID = Grants2.competition_ID
+            JOIN Awarded Awarded2 ON GP_2.grant_proposal_ID = Awarded2.grant_proposal_ID
+            WHERE Grants2.app_deadline < "{}" AND GP_2.amount_awarded > Grant_Proposals.amount_awarded
+        )
+        """.format(date,date)
+        try: 
+            cur.execute(date_query)
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print("Error retrieving records for the specified date :( ")
+
 def main():
     database = "council.db"
 
     conn = create_connection(database)
-    user_specified_area(conn)
+    user_specified_date(conn)
 
 if __name__ == "__main__":
     main()
