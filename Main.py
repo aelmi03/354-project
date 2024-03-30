@@ -12,8 +12,8 @@
 import sqlite3
 from sqlite3 import Error
 
-# source code: https://www.sqlitetutorial.net/sqlite-python/sqlite-python-select/
-
+#create_connection() creates the connection to the db
+#source: https://www.sqlitetutorial.net/sqlite-python/creating-database/
 def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by the db_file
@@ -28,6 +28,10 @@ def create_connection(db_file):
 
     return conn
 
+# descripton: Find all competitions (calls for grant proposals) open at a user-specified month, 
+# which already have at least one submitted large proposal. 
+# For a proposal to be large, it has to request more than $20,000 or to have more than 10 participants, 
+# including the principle investigator. Return both IDs and the titles.
 def competitions_specific_month(conn):
     month = input("Enter a month (value from 1-12): ")
     date = "2024-{}-01".format(month)
@@ -54,7 +58,7 @@ def competitions_specific_month(conn):
         except Error as e:
             print("Error retrieving records for the specified month :( ") 
     
-#For a user specified area, find the proposals that request the largest amount of money 
+#Description: For a user specified area, find the proposals that request the largest amount of money 
 def user_specified_area(conn):
     print("------------------------------------------------------")
     print("You hae chosen number 1, Find the proposals that request the largest amount of money")
@@ -82,6 +86,8 @@ def user_specified_area(conn):
         
         print("------------------------------------------------------")
 
+# Description: For a user-specified date,  find the proposals submitted before that 
+# date that are awarded the largest amount of money.
 def user_specified_date(conn):
     date = input("Enter a date (YYYY-MM-DD): ")
     with conn:
@@ -105,6 +111,8 @@ def user_specified_date(conn):
         except Error as e:
             print("Error retrieving records for the specified date :( ")
 
+# Description: For an area specified by the user, output its average requested/awarded discrepancy, 
+# that is, the absolute value of the difference between the amounts.
 def average_discrepancy(conn):
     area = input("Enter an area:")
     with conn:
@@ -124,6 +132,7 @@ def average_discrepancy(conn):
         except Error as e: 
             print("Error retrieving records for the specified area :( ")
 
+# Description: For a user-specified name,  find the proposal(s) he/she needs to review
 def proposals_by_name(conn):
     name = input("Enter a name:").split()
     first_name = name[0]
@@ -144,11 +153,11 @@ def proposals_by_name(conn):
         except Error as e:
             print("Error retrieving records for the specified name :( ")
 
+
 def main():
     database = "council.db"
 
     conn = create_connection(database)
-    print("hello")
 
     x = 10
     while x != 0:
