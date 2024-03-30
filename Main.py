@@ -65,7 +65,7 @@ def user_specified_area(conn):
     print("Please choose on of the areas of study:")
     print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
     
-    area = input("Enter an area:")
+    area = input("Enter an area: ")
     with conn:
         cur = conn.cursor()
         area_query = """ 
@@ -77,7 +77,7 @@ def user_specified_area(conn):
         )
         """.format(area,area)
         try: 
-            cur.execute(area_query)
+            cur.execute(area_query) 
             rows = cur.fetchall()
             for row in rows:
                 print(row)
@@ -169,7 +169,7 @@ def main():
         print("5: Find all open competitions that have at least one large submitted proposal(20,000 or more requested)")
         print("6: Reviewer Assignment")
 
-        x = int(input("Please enter the number of the option you want to go to:"))
+        x = int(input("Please enter the number of the option you want to go to: "))
         if x > 6:
             print("Sorry that is an invalid number, please input a valid number between 0 and 6")
             print()
