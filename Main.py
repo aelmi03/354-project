@@ -155,7 +155,7 @@ def main():
 
         x = input("Please enter the number of the option you want to go to:")
         if x > 6:
-            x = input("Sorry that is an invalid number, please input a valid number")
+            x = input("Sorry that is an invalid number, please input a valid number between 0 and 6")
 
         match x:
             case 1: 
@@ -164,6 +164,10 @@ def main():
                 user_specified_date(conn)
             case 3:
                 average_discrepancy(conn)
+            case 4:
+                proposals_by_name(conn)
+            case 5: 
+                competitions_specific_month(conn)
 
 
 
