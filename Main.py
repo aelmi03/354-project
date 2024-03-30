@@ -54,16 +54,33 @@ def competitions_specific_month(conn):
             print("Error retrieving records for the specified month :( ")
             
         
-    return
     
     
+def user_specified_area(conn):
+    area = input("Enter an area:")
+    with conn:
+        cur = conn.cursor()
+        area_query = """ 
+        SELECT * FROM Grant_Proposals JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID WHERE
+        Grants.topic = "{}" AND
+        NOT EXISTS (
+            SELECT 1 FROM Grant_Proposals GP_2 JOIN Grants Grants2 ON GP_2.competition_ID = Grants2.competition_ID
+            WHERE Grants2.topic = "{}" AND GP_2.requested_amount > Grant_Proposals.requested_amount
+        )
+        """.format(area,area)
+        try: 
+            cur.execute(area_query)
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print("Error retrieving records for the specified area :( ")
 
 def main():
     database = "council.db"
 
     conn = create_connection(database)
-    competitions_specific_month(conn)
-    
+    user_specified_area(conn)
 
 if __name__ == "__main__":
     main()
