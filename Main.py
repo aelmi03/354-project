@@ -117,11 +117,31 @@ def average_discrepancy(conn):
         except Error as e: 
             print("Error retrieving records for the specified area :( ")
 
+def proposals_by_name(conn):
+    name = input("Enter a name:").split()
+    first_name = name[0]
+    last_name = name[1]
+    with conn:
+        cur = conn.cursor()
+        name_query = """
+            SELECT Grant_Proposals.grant_proposal_ID, Grants.title FROM Reviewers 
+            JOIN Assigned ON Reviewers.reviewer_ID = Assigned.reviewer_ID JOIN Assignment ON Assigned.assignment_ID = Assignment.assignment_ID
+            JOIN Grant_Proposals ON Assignment.grant_proposal_ID = Grant_Proposals.grant_proposal_ID JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
+            WHERE Reviewers.first_name = "{}" AND Reviewers.last_name = "{}"
+        """.format(first_name,last_name)
+        try:
+            cur.execute(name_query)
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print("Error retrieving records for the specified name :( ")
+
 def main():
     database = "council.db"
 
     conn = create_connection(database)
-    average_discrepancy(conn)
+    proposals_by_name(conn)
 
     x = 10
     while x != 0:
@@ -150,3 +170,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+   
