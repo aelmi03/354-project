@@ -54,8 +54,13 @@ def competitions_specific_month(conn):
         except Error as e:
             print("Error retrieving records for the specified month :( ") 
     
-    
+#For a user specified area, find the proposals that request the largest amount of money 
 def user_specified_area(conn):
+    print("------------------------------------------------------")
+    print("You hae chosen number 1, Find the proposals that request the largest amount of money")
+    print("Please choose on of the areas of study:")
+    print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
+    
     area = input("Enter an area:")
     with conn:
         cur = conn.cursor()
@@ -74,6 +79,8 @@ def user_specified_area(conn):
                 print(row)
         except Error as e:
             print("Error retrieving records for the specified area :( ")
+        
+        print("------------------------------------------------------")
 
 def user_specified_date(conn):
     date = input("Enter a date (YYYY-MM-DD): ")
@@ -141,7 +148,7 @@ def main():
     database = "council.db"
 
     conn = create_connection(database)
-    proposals_by_name(conn)
+    print("hello")
 
     x = 10
     while x != 0:
@@ -153,9 +160,10 @@ def main():
         print("5: Find all open competitions that have at least one large submitted proposal(20,000 or more requested)")
         print("6: Reviewer Assignment")
 
-        x = input("Please enter the number of the option you want to go to:")
+        x = int(input("Please enter the number of the option you want to go to:"))
         if x > 6:
-            x = input("Sorry that is an invalid number, please input a valid number between 0 and 6")
+            print("Sorry that is an invalid number, please input a valid number between 0 and 6")
+            print()
 
         match x:
             case 1: 
@@ -170,8 +178,5 @@ def main():
                 competitions_specific_month(conn)
 
 
-
-
 if __name__ == "__main__":
     main()
-   
