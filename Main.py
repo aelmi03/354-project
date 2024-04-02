@@ -80,6 +80,8 @@ def user_specified_area(conn):
         try: 
             cur.execute(area_query) 
             rows = cur.fetchall()
+            if(rows.length == 0 ):
+                print("Sorry there's records found for the specified area")
             for row in rows:
                 print(row)
         except Error as e:
@@ -108,6 +110,8 @@ def user_specified_date(conn):
         try: 
             cur.execute(date_query)
             rows = cur.fetchall()
+            if(rows.length == 0 ):
+                print("Sorry there's records found for the specified date")
             for row in rows:
                 print(row)
         except Error as e:
@@ -159,6 +163,15 @@ def proposals_by_name(conn):
         except Error as e:
             print("Error retrieving records for the specified name :( ")
 
+def assign_set_of_reviewers(conn):
+    grant_proposla_ID = input("Enter a grant proposal ID:")
+    with conn:
+        cur = conn.cursor()
+        possible_reviewers_query = """ 
+        SELECT * FROM Reviewers WHERE
+        
+        """
+    return
 
 def main():
     database = "council.db"
