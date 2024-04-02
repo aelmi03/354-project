@@ -141,10 +141,10 @@ def user_specified_date(conn):
 def average_discrepancy(conn):
     print("You have chosen option 3, for an area, find the average requested/awarded discrepancy")
     print("Choose from the following areas of study:")
-    print("Aerodynamics, Agriculture, Environmental, Computer Science, Sociology")
+    print("Aerodynamics, Agriculture, Environmental, Sociology")
     area = input("Enter an area: ")
     print()
-    list = ["Aerodynamics", "Agriculture", "Environmental", "Sociology"]
+    list = ["Aerodynamics", "Agriculture", "Environmental",  "Sociology"]
 
     while (area not in list):
         print("That is not a valid area of study, please input on of the following")
@@ -235,7 +235,7 @@ def main():
                 proposals_by_name(conn)
             case 5: 
                 competitions_specific_month(conn)
-
+    print("quitting program...")
 
 if __name__ == "__main__":
     main()
