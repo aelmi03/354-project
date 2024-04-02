@@ -123,7 +123,14 @@ def average_discrepancy(conn):
     print("You have chosen option 3, for an area, find the average requested/awarded discrepancy")
     print("Choose from the following areas of study:")
     print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
-    area = input("Enter an area:")
+    area = input("Enter an area: ")
+    list = ["Medical", "Engineering", "Aerodynamics", "Agriculture", "Big Data", "Environmental", "Computer Science", "Sociology"]
+
+    while (area not in list):
+        print("That is not a valid area of study, please input on of the following")
+        print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
+        area = input("Enter an area: ")
+        
     with conn:
         cur = conn.cursor()
         discrepancy_query = """
