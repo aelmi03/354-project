@@ -65,6 +65,8 @@ def user_specified_area(conn):
     print("You have chosen option 1, Find the proposals that request the largest amount of money")
     print("Please choose on of the areas of study:")
     print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
+
+    list = ["Medical", "Engineering", "Aerodynamics", "Agriculture", "Big Data", "Environmental", "Computer Science", "Sociology"]
     
     area = input("Enter an area: ")
     with conn:
@@ -81,7 +83,7 @@ def user_specified_area(conn):
             cur.execute(area_query) 
             rows = cur.fetchall()
             if(rows.length == 0 ):
-                print("Sorry there's records found for the specified area")
+                print("Sorry there's no records found for the specified area")
             for row in rows:
                 print(row)
         except Error as e:
@@ -122,15 +124,15 @@ def user_specified_date(conn):
 def average_discrepancy(conn):
     print("You have chosen option 3, for an area, find the average requested/awarded discrepancy")
     print("Choose from the following areas of study:")
-    print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
+    print("Aerodynamics, Agriculture, Environmental, Computer Science, Sociology")
     area = input("Enter an area: ")
-    list = ["Medical", "Engineering", "Aerodynamics", "Agriculture", "Big Data", "Environmental", "Computer Science", "Sociology"]
+    list = ["Aerodynamics", "Agriculture", "Environmental", "Sociology"]
 
     while (area not in list):
         print("That is not a valid area of study, please input on of the following")
         print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
         area = input("Enter an area: ")
-        
+
     with conn:
         cur = conn.cursor()
         discrepancy_query = """
