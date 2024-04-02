@@ -198,7 +198,7 @@ def assign_set_of_reviewers(conn):
     with conn:
         cur = conn.cursor()
         grant_competition_query = """
-            SELECT competition_ID, app_deadline FROM Grant_Proposals JOIN Grants WHERE grant_proposal_ID = "{}"
+            SELECT Grant_Proposals.competition_ID, Grants.app_deadline FROM Grant_Proposals JOIN Grants WHERE grant_proposal_ID = "{}"
             """.format(grant_proposal_ID)
         cur.execute(grant_competition_query)
         competition_row = cur.fetchone()
