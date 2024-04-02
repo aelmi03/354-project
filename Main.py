@@ -294,6 +294,8 @@ def main():
                 proposals_by_name(conn)
             case 5: 
                 competitions_specific_month(conn)
+            case 6:
+                assign_set_of_reviewers(conn)
     print("quitting program...")
 
 if __name__ == "__main__":
