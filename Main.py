@@ -63,12 +63,21 @@ def competitions_specific_month(conn):
 def user_specified_area(conn):
     print("------------------------------------------------------")
     print("You have chosen option 1, Find the proposals that request the largest amount of money")
-    print("Please choose on of the areas of study:")
+    print("Please choose on of the areas of study: ")
     print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
 
     list = ["Medical", "Engineering", "Aerodynamics", "Agriculture", "Big Data", "Environmental", "Computer Science", "Sociology"]
     
     area = input("Enter an area: ")
+    print()
+
+    while (area not in list):
+        print("Sorry that is not a valid area of study")
+        print("Please choose on of the areas of study:")
+        print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
+        area = input("Enter an area: ")
+        print()
+
     with conn:
         cur = conn.cursor()
         area_query = """ 
@@ -96,6 +105,7 @@ def user_specified_area(conn):
 def user_specified_date(conn):
     print("You have chosen option 2, for a specified date, find the proposals submitted before that date that are awarded the largest amount of money")
     date = input("Enter a date (YYYY-MM-DD): ")
+    print()
     with conn:
         cur = conn.cursor()
         # 
@@ -126,12 +136,14 @@ def average_discrepancy(conn):
     print("Choose from the following areas of study:")
     print("Aerodynamics, Agriculture, Environmental, Computer Science, Sociology")
     area = input("Enter an area: ")
+    print()
     list = ["Aerodynamics", "Agriculture", "Environmental", "Sociology"]
 
     while (area not in list):
         print("That is not a valid area of study, please input on of the following")
-        print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
+        print("Aerodynamics, Agriculture, Environmental, Computer Science, Sociology")
         area = input("Enter an area: ")
+        print()
 
     with conn:
         cur = conn.cursor()
@@ -154,6 +166,8 @@ def average_discrepancy(conn):
 def proposals_by_name(conn):
     print("You have chose option 4, for a specified name, find the proposal he/she needs to review")
     name = input("Enter a name:").split()
+    print()
+
     first_name = name[0]
     last_name = name[1]
     with conn:
@@ -186,7 +200,7 @@ def main():
     database = "council.db"
 
     conn = create_connection(database)
-
+    print()
     x = 10
     while x != 0:
         print("0: Quit")
@@ -196,6 +210,7 @@ def main():
         print("4: Find the proposals that need to be reviewed with a given name")
         print("5: Find all open competitions that have at least one large submitted proposal(20,000 or more requested)")
         print("6: Reviewer Assignment")
+        print()
 
         x = int(input("Please enter the number of the option you want to go to: "))
         if x > 6:
