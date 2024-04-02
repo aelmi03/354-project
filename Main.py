@@ -194,14 +194,73 @@ def proposals_by_name(conn):
             print("Error retrieving records for the specified name :( ")
 
 def assign_set_of_reviewers(conn):
-    grant_proposla_ID = input("Enter a grant proposal ID:")
+    grant_proposal_ID = input("Enter a grant proposal ID:")
     with conn:
         cur = conn.cursor()
-        possible_reviewers_query = """ 
-        SELECT * FROM Reviewers WHERE
-        
+        grant_competition_query = """
+            SELECT competition_ID, app_deadline FROM Grant_Proposals JOIN Grants WHERE grant_proposal_ID = "{}"
+            """.format(grant_proposal_ID)
+        cur.execute(grant_competition_query)
+        competition_row = cur.fetchone()
+        grant_competition_ID =  competition_row[0]
+        deadline = competition_row[1]
+        assignment_query = """
+            SELECT * FROM Assignment WHERE grant_competition_ID = "{}"
+            """.format(grant_competition_ID)
+        cur.execute(assignment_query)
+        assignment_rows = cur.fetchall()
+        if(assignment_rows == 0):
+            create_assignment_query = """
+            INSERT INTO Assignment(competition_ID,num_of_reviewers,deadline,submitted) VALUES ("{}",0,"{}", false)
+            """.format(grant_competition_ID,deadline)
+            cur.execute(create_assignment_query)
+            assignment_rows = cur.fetchall()
+           
+        possible_reviewers_query = """
+        SELECT * FROM Reviewers WHERE Reviewers.grant_applications_reviewed <= 3
+        AND NOT EXISTS (
+            SELECT 1 FROM Collaborators JOIN Grant_Proposals WHERE Collaborators.grant_proposal_ID = Grant_Proposals.grant_proposal_ID
+            AND EXISTS (SELECT 1 FROM conflict_researchers WHERE (conflict_researchers.researcher_ID1 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID2 = Reviewers.reviewer_ID) OR (conflict_researchers.researcher_ID2 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID1 = Reviewers.reviewer_ID)
+        )
         """
+        assignment_ID = assignment_rows[0][0]
+        try:
+            cur.execute(possible_reviewers_query)
+            rows = cur.fetchall()
+            while(True):
+                print("Available reviewers:")
+                for row in rows:
+                    print(row)
+                reviewer_ID = input("Enter a reviewer ID:")
+                if(check_in_rows(rows,reviewer_ID) == False):
+                    print("Not a valid reviewer ID, please enter a valid reviewer ID")
+                    continue
+                else:
+                    add_reviewer_query = """
+                    INSERT INTO Assigned(reviewer_ID, assignment_ID) VALUES ("{}", "{}")
+                    """.format(reviewer_ID, assignment_ID)
+                    update_reviewers_query = """
+                    UPDATE Reviewers SET grant_applications_reviewed = grant_applications_reviewed + 1 WHERE reviewer_ID = "{}"
+                    """.format(reviewer_ID)
+                    update_assignment_query = """
+                    UPDATE Assignment SET num_of_reviewers = num_of_reviewers + 1 WHERE assignment_ID = "{}"
+                    """.format(assignment_ID)
+                    cur.execute(update_assignment_query)
+                    cur.execute(update_reviewers_query)
+                    cur.execute(add_reviewer_query)
+                    print("Reviewer Added to the assignment")
+                    add_another_reviewer = print("Would you like to add another reviewer? (Y/N)")
+                    if(add_another_reviewer == "N"):
+                        break            
+        except Error as e:
+            print("Error retrieving records for the specified name :( ")    
     return
+
+def check_in_rows(rows,reviewer_ID):
+    for row in rows:
+        if(row[0] == reviewer_ID):
+            return True
+    return False
 
 def main():
     database = "council.db"
