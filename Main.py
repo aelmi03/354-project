@@ -35,6 +35,13 @@ def create_connection(db_file):
 def competitions_specific_month(conn):
     print("You have chosen option 5, find all open competitions which have at least one submitted large proposal.")
     month = input("Enter a month (value from 1-12): ")
+
+    list = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12"]
+    while(month not in list):
+        print("Sorry, that is not a valid month, please input a value from 1-12")
+        month = input("Enter a month (value from 1-12): ")
+        print()
+
     date = "2024-{}-01".format(month)
     with conn:
         
