@@ -98,7 +98,7 @@ def user_specified_area(conn):
         try: 
             cur.execute(area_query) 
             rows = cur.fetchall()
-            if(rows.length == 0 ):
+            if(len(rows) == 0 ):
                 print("Sorry there's no records found for the specified area")
             for row in rows:
                 print(row)
@@ -129,7 +129,7 @@ def user_specified_date(conn):
         try: 
             cur.execute(date_query)
             rows = cur.fetchall()
-            if(rows.length == 0 ):
+            if(len(rows) == 0 ):
                 print("Sorry there's records found for the specified date")
             for row in rows:
                 print(row)
