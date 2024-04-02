@@ -33,6 +33,7 @@ def create_connection(db_file):
 # For a proposal to be large, it has to request more than $20,000 or to have more than 10 participants, 
 # including the principle investigator. Return both IDs and the titles.
 def competitions_specific_month(conn):
+    print("You have chosen option 5, find all open competitions which have at least one submitted large proposal.")
     month = input("Enter a month (value from 1-12): ")
     date = "2024-{}-01".format(month)
     with conn:
@@ -61,7 +62,7 @@ def competitions_specific_month(conn):
 #Description: For a user specified area, find the proposals that request the largest amount of money 
 def user_specified_area(conn):
     print("------------------------------------------------------")
-    print("You hae chosen number 1, Find the proposals that request the largest amount of money")
+    print("You have chosen option 1, Find the proposals that request the largest amount of money")
     print("Please choose on of the areas of study:")
     print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
     
@@ -89,6 +90,7 @@ def user_specified_area(conn):
 # Description: For a user-specified date,  find the proposals submitted before that 
 # date that are awarded the largest amount of money.
 def user_specified_date(conn):
+    print("You have chosen option 2, for a specified date, find the proposals submitted before that date that are awarded the largest amount of money")
     date = input("Enter a date (YYYY-MM-DD): ")
     with conn:
         cur = conn.cursor()
@@ -114,6 +116,9 @@ def user_specified_date(conn):
 # Description: For an area specified by the user, output its average requested/awarded discrepancy, 
 # that is, the absolute value of the difference between the amounts.
 def average_discrepancy(conn):
+    print("You have chosen option 3, for an area, find the average requested/awarded discrepancy")
+    print("Choose from the following areas of study:")
+    print("Medical, Engineering, Aerodynamics, Agriculture, Big Data, Environmental, Computer Science, Sociology")
     area = input("Enter an area:")
     with conn:
         cur = conn.cursor()
@@ -134,6 +139,7 @@ def average_discrepancy(conn):
 
 # Description: For a user-specified name,  find the proposal(s) he/she needs to review
 def proposals_by_name(conn):
+    print("You have chose option 4, for a specified name, find the proposal he/she needs to review")
     name = input("Enter a name:").split()
     first_name = name[0]
     last_name = name[1]
