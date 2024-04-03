@@ -205,29 +205,40 @@ def assign_set_of_reviewers(conn):
         grant_competition_ID =  competition_row[0]
         deadline = competition_row[1]
         assignment_query = """
-            SELECT * FROM Assignment WHERE grant_competition_ID = "{}"
+            SELECT * FROM Assignment WHERE competition_ID = "{}"
             """.format(grant_competition_ID)
         cur.execute(assignment_query)
         assignment_rows = cur.fetchall()
-        if(assignment_rows == 0):
+        print(len(assignment_rows))
+        if(len(assignment_rows) == 0):
             create_assignment_query = """
-            INSERT INTO Assignment(competition_ID,num_of_reviewers,deadline,submitted) VALUES ("{}",0,"{}", false)
+            INSERT INTO Assignment(competition_ID,num_of_reviewers,deadline,submitted) 
+            VALUES ("{}",0,"{}", false)
             """.format(grant_competition_ID,deadline)
             cur.execute(create_assignment_query)
-            assignment_rows = cur.fetchall()
+            print("CREATED ASSIGNMENT")
+            cur.execute(assignment_query)
+            assignment_rows = cur.fetchone()
+            conn.commit()
+            print(assignment_rows)
            
         possible_reviewers_query = """
         SELECT * FROM Reviewers WHERE Reviewers.grant_applications_reviewed <= 3
         AND NOT EXISTS (
-            SELECT 1 FROM Collaborators JOIN Grant_Proposals WHERE Collaborators.grant_proposal_ID = Grant_Proposals.grant_proposal_ID
-            AND EXISTS (SELECT 1 FROM conflict_researchers WHERE (conflict_researchers.researcher_ID1 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID2 = Reviewers.reviewer_ID) OR (conflict_researchers.researcher_ID2 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID1 = Reviewers.reviewer_ID)
+            SELECT 1 FROM Collaborators, Grant_Proposals WHERE Collaborators.grant_proposal_ID = Grant_Proposals.grant_proposal_ID
+            AND EXISTS (SELECT 1 FROM conflict_researchers WHERE 
+            (conflict_researchers.researcher_ID1 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID2 = Reviewers.reviewer_ID) 
+            OR (conflict_researchers.researcher_ID2 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID1 = Reviewers.reviewer_ID)
         )
-        """
-        assignment_ID = assignment_rows[0][0]
+        """.format(grant_proposal_ID)
+        print(assignment_rows)
+        assignment_ID = assignment_rows[0]
         try:
             cur.execute(possible_reviewers_query)
+        
             rows = cur.fetchall()
-            while(True):
+            another_reviewer_bool = True
+            while(len(rows) >= 0 and another_reviewer_bool == True):
                 print("Available reviewers:")
                 for row in rows:
                     print(row)
@@ -249,11 +260,12 @@ def assign_set_of_reviewers(conn):
                     cur.execute(update_reviewers_query)
                     cur.execute(add_reviewer_query)
                     print("Reviewer Added to the assignment")
-                    add_another_reviewer = print("Would you like to add another reviewer? (Y/N)")
+                    conn.commit()
+                    add_another_reviewer = input("Would you like to add another reviewer? (Y/N)")
                     if(add_another_reviewer == "N"):
-                        break            
+                        another_reviewer_bool = False         
         except Error as e:
-            print("Error retrieving records for the specified name :( ")    
+            print("Error retrieving records :( ")    
     return
 
 def check_in_rows(rows,reviewer_ID):
