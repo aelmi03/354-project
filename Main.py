@@ -66,7 +66,7 @@ def competitions_specific_month(conn):
         except Error as e:
             print("Error retrieving records for the specified month :( ") 
     
-#Description: For a user specified area, find the proposals that request the largest amount of money 
+# 1 Description: For a user specified area, find the proposals that request the largest amount of money 
 def user_specified_area(conn):
     print("------------------------------------------------------")
     print("You have chosen option 1, Find the proposals that request the largest amount of money")
@@ -124,13 +124,14 @@ def user_specified_date(conn):
             SELECT 1 FROM Grant_Proposals GP_2 JOIN Grants Grants2 ON GP_2.competition_ID = Grants2.competition_ID
             JOIN Awarded Awarded2 ON GP_2.grant_proposal_ID = Awarded2.grant_proposal_ID
             WHERE Grants2.app_deadline < "{}" AND GP_2.amount_awarded > Grant_Proposals.amount_awarded
+            AND GP_2.grant_proposal_ID != Grant_Proposals.grant_proposal_ID
         )
         """.format(date,date)
         try: 
             cur.execute(date_query)
             rows = cur.fetchall()
             if(len(rows) == 0 ):
-                print("Sorry there's records found for the specified date")
+                print("Sorry there's no records found for the specified date")
             for row in rows:
                 print(row)
         except Error as e:
@@ -183,7 +184,7 @@ def proposals_by_name(conn):
         name_query = """
             SELECT Grant_Proposals.grant_proposal_ID, Grants.title FROM Reviewers 
             JOIN Assigned ON Reviewers.reviewer_ID = Assigned.reviewer_ID JOIN Assignment ON Assigned.assignment_ID = Assignment.assignment_ID
-            JOIN Grant_Proposals ON Assignment.grant_proposals = Grant_Proposals.grant_proposals JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
+            JOIN Grant_Proposals ON Assignment.grant_proposal_ID = Grant_Proposals.grant_proposal_ID JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
             WHERE Reviewers.first_name = "{}" AND Reviewers.last_name = "{}" AND Assignment.submitted = false
         """.format(first_name,last_name)
         try:
@@ -207,16 +208,16 @@ def assign_set_of_reviewers(conn):
         grant_competition_ID =  competition_row[0]
         deadline = competition_row[1]
         assignment_query = """
-            SELECT * FROM Assignment WHERE competition_ID = "{}"
-            """.format(grant_competition_ID)
+            SELECT * FROM Assignment WHERE grant_proposal_ID = "{}"
+            """.format(grant_proposal_ID)
         cur.execute(assignment_query)
         assignment_rows = cur.fetchone()
         print(assignment_rows)
         if(assignment_rows is None):
             create_assignment_query = """
-            INSERT INTO Assignment(competition_ID,num_of_reviewers,deadline,submitted) 
+            INSERT INTO Assignment(grant_proposal_ID,num_of_reviewers,deadline,submitted) 
             VALUES ("{}",0,"{}", false)
-            """.format(grant_competition_ID,deadline)
+            """.format(grant_proposal_ID,deadline)
             cur.execute(create_assignment_query)
             print("CREATED ASSIGNMENT")
             cur.execute(assignment_query)
@@ -301,6 +302,7 @@ def reset_data(conn):
             cur.execute(delete_assignment_values)
             cur.execute(delete_participant_values)
             conn.commit()
+            print("Deleting data...")
         except Error as e:
             print(e)
             print("Error deleting records :( ")    
