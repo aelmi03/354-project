@@ -183,7 +183,7 @@ def proposals_by_name(conn):
         name_query = """
             SELECT Grant_Proposals.grant_proposal_ID, Grants.title FROM Reviewers 
             JOIN Assigned ON Reviewers.reviewer_ID = Assigned.reviewer_ID JOIN Assignment ON Assigned.assignment_ID = Assignment.assignment_ID
-            JOIN Grant_Proposals ON Assignment.competition_ID = Grant_Proposals.competition_ID JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
+            JOIN Grant_Proposals ON Assignment.grant_proposals = Grant_Proposals.grant_proposals JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
             WHERE Reviewers.first_name = "{}" AND Reviewers.last_name = "{}" AND Assignment.submitted = false
         """.format(first_name,last_name)
         try:
