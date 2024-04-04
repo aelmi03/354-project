@@ -28,7 +28,7 @@ def create_connection(db_file):
 
     return conn
 
-# descripton: Find all competitions (calls for grant proposals) open at a user-specified month, 
+# 5 descripton: Find all competitions (calls for grant proposals) open at a user-specified month, 
 # which already have at least one submitted large proposal. 
 # For a proposal to be large, it has to request more than $20,000 or to have more than 10 participants, 
 # including the principle investigator. Return both IDs and the titles.
@@ -36,10 +36,10 @@ def competitions_specific_month(conn):
     print("You have chosen option 5, find all open competitions which have at least one submitted large proposal.")
     month = input("Enter a month (value from 1-12): ")
 
-    list = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12"]
+    list = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
     while(month not in list):
-        print("Sorry, that is not a valid month, please input a value from 1-12")
-        month = input("Enter a month (value from 1-12): ")
+        print("Sorry, that is not a valid month, please input a value from 01-12")
+        month = input("Enter a month (please put a 0 before the number if it is a singl digit): ")
         print()
 
     date = "2024-{}-01".format(month)
@@ -61,8 +61,11 @@ def competitions_specific_month(conn):
         try: 
             cur.execute(month_query)
             rows = cur.fetchall()
-            for row in rows:
-                print(row)
+            if (len(rows) == 0):
+                print("sorry there are no open competitions with at least one large submitted proposal")
+            else:
+                for row in rows:
+                    print(row)
         except Error as e:
             print("Error retrieving records for the specified month :( ") 
     
