@@ -205,14 +205,13 @@ def assign_set_of_reviewers(conn):
             """.format(grant_proposal_ID)
         cur.execute(grant_competition_query)
         competition_row = cur.fetchone()
-        grant_competition_ID =  competition_row[0]
         deadline = competition_row[1]
         assignment_query = """
             SELECT * FROM Assignment WHERE grant_proposal_ID = "{}"
             """.format(grant_proposal_ID)
         cur.execute(assignment_query)
         assignment_rows = cur.fetchone()
-        print(assignment_rows)
+        print()
         if(assignment_rows is None):
             create_assignment_query = """
             INSERT INTO Assignment(grant_proposal_ID,num_of_reviewers,deadline,submitted) 
@@ -222,10 +221,7 @@ def assign_set_of_reviewers(conn):
             print("CREATED ASSIGNMENT")
             cur.execute(assignment_query)
             assignment_rows = cur.fetchone()
-            conn.commit()
-     
-        
-            
+            conn.commit() 
         assignment_ID = assignment_rows[0]
         possible_reviewers_query = """
         SELECT * FROM Reviewers WHERE Reviewers.grant_applications_reviewed <= 3
@@ -235,7 +231,7 @@ def assign_set_of_reviewers(conn):
             (conflict_researchers.researcher_ID1 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID2 = Reviewers.reviewer_ID) 
             OR (conflict_researchers.researcher_ID2 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID1 = Reviewers.reviewer_ID)
             OR Reviewers.institution = Researchers.organization)
-            AND EXISTS(SELECT 1 FROM Assigned WHERE Assigned.reviewer_ID = Reviewers.reviewer_ID AND Assigned.assignment_ID = "{}"))
+            AND EXISTS (SELECT 1 FROM Assigned WHERE Assigned.reviewer_ID = Reviewers.reviewer_ID AND Assigned.assignment_ID = "{}"))
         """.format(grant_proposal_ID, assignment_ID)
 
         try:
@@ -312,6 +308,7 @@ def main():
     database = "council.db"
 
     conn = create_connection(database)
+    print()
     print("Welcome to Council Database. If this is your first time using this program, please choose option 7 before choosing option 6")
     print("if you would like to reassign all reviewers.")
     print()
