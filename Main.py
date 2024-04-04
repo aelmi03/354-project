@@ -177,13 +177,14 @@ def proposals_by_name(conn):
 
     first_name = name[0]
     last_name = name[1]
+
     with conn:
         cur = conn.cursor()
         name_query = """
             SELECT Grant_Proposals.grant_proposal_ID, Grants.title FROM Reviewers 
             JOIN Assigned ON Reviewers.reviewer_ID = Assigned.reviewer_ID JOIN Assignment ON Assigned.assignment_ID = Assignment.assignment_ID
-            JOIN Grant_Proposals ON Assignment.grant_proposal_ID = Grant_Proposals.grant_proposal_ID JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
-            WHERE Reviewers.first_name = "{}" AND Reviewers.last_name = "{}"
+            JOIN Grant_Proposals ON Assignment.competition_ID = Grant_Proposals.competition_ID JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
+            WHERE Reviewers.first_name = "{}" AND Reviewers.last_name = "{}" AND Assignment.submitted = false
         """.format(first_name,last_name)
         try:
             cur.execute(name_query)
@@ -191,6 +192,7 @@ def proposals_by_name(conn):
             for row in rows:
                 print(row)
         except Error as e:
+            print(e)
             print("Error retrieving records for the specified name :( ")
 
 def assign_set_of_reviewers(conn):
@@ -208,9 +210,9 @@ def assign_set_of_reviewers(conn):
             SELECT * FROM Assignment WHERE competition_ID = "{}"
             """.format(grant_competition_ID)
         cur.execute(assignment_query)
-        assignment_rows = cur.fetchall()
-        print(len(assignment_rows))
-        if(len(assignment_rows) == 0):
+        assignment_rows = cur.fetchone()
+        print(assignment_rows)
+        if(assignment_rows is None):
             create_assignment_query = """
             INSERT INTO Assignment(competition_ID,num_of_reviewers,deadline,submitted) 
             VALUES ("{}",0,"{}", false)
@@ -220,29 +222,34 @@ def assign_set_of_reviewers(conn):
             cur.execute(assignment_query)
             assignment_rows = cur.fetchone()
             conn.commit()
-            print(assignment_rows)
-           
+     
+        
+            
+        assignment_ID = assignment_rows[0]
         possible_reviewers_query = """
         SELECT * FROM Reviewers WHERE Reviewers.grant_applications_reviewed <= 3
         AND NOT EXISTS (
-            SELECT 1 FROM Collaborators, Grant_Proposals WHERE Collaborators.grant_proposal_ID = Grant_Proposals.grant_proposal_ID
+            SELECT 1 FROM Collaborators JOIN Researchers ON Collaborators.researcher_ID = Researchers.researcher_ID  WHERE Collaborators.grant_proposal_ID = "{}"
             AND EXISTS (SELECT 1 FROM conflict_researchers WHERE 
             (conflict_researchers.researcher_ID1 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID2 = Reviewers.reviewer_ID) 
             OR (conflict_researchers.researcher_ID2 = Collaborators.researcher_ID AND conflict_researchers.researcher_ID1 = Reviewers.reviewer_ID)
-        )
-        """.format(grant_proposal_ID)
-        print(assignment_rows)
-        assignment_ID = assignment_rows[0]
+            OR Reviewers.institution = Researchers.organization)
+            AND EXISTS(SELECT 1 FROM Assigned WHERE Assigned.reviewer_ID = Reviewers.reviewer_ID AND Assigned.assignment_ID = "{}"))
+        """.format(grant_proposal_ID, assignment_ID)
+
         try:
             cur.execute(possible_reviewers_query)
-        
             rows = cur.fetchall()
             another_reviewer_bool = True
             while(len(rows) >= 0 and another_reviewer_bool == True):
+
+                
                 print("Available reviewers:")
                 for row in rows:
                     print(row)
-                reviewer_ID = input("Enter a reviewer ID:")
+                reviewer_ID = input("Enter a reviewer ID or -1 to cancel: ")
+                if(reviewer_ID == "-1"):
+                    break
                 if(check_in_rows(rows,reviewer_ID) == False):
                     print("Not a valid reviewer ID, please enter a valid reviewer ID")
                     continue
@@ -250,34 +257,61 @@ def assign_set_of_reviewers(conn):
                     add_reviewer_query = """
                     INSERT INTO Assigned(reviewer_ID, assignment_ID) VALUES ("{}", "{}")
                     """.format(reviewer_ID, assignment_ID)
+
                     update_reviewers_query = """
                     UPDATE Reviewers SET grant_applications_reviewed = grant_applications_reviewed + 1 WHERE reviewer_ID = "{}"
                     """.format(reviewer_ID)
+
                     update_assignment_query = """
                     UPDATE Assignment SET num_of_reviewers = num_of_reviewers + 1 WHERE assignment_ID = "{}"
                     """.format(assignment_ID)
+                    
                     cur.execute(update_assignment_query)
                     cur.execute(update_reviewers_query)
                     cur.execute(add_reviewer_query)
+
                     print("Reviewer Added to the assignment")
                     conn.commit()
                     add_another_reviewer = input("Would you like to add another reviewer? (Y/N)")
-                    if(add_another_reviewer == "N"):
-                        another_reviewer_bool = False         
+                    if(add_another_reviewer == "N" or add_another_reviewer == "n"):
+                        another_reviewer_bool = False      
+                    else:
+                        cur.execute(possible_reviewers_query)
+                        rows = cur.fetchall()   
         except Error as e:
+            print(e)
             print("Error retrieving records :( ")    
     return
 
 def check_in_rows(rows,reviewer_ID):
     for row in rows:
-        if(row[0] == reviewer_ID):
+        if(row[0] == int(reviewer_ID)):
             return True
     return False
+
+def reset_data(conn):
+    with conn:
+        cur = conn.cursor()
+        delete_assigned_values = """ DELETE FROM Assigned """
+        delete_assignment_values = """ DELETE FROM Assignment """
+        delete_participant_values = """ DELETE FROM Participants_table """
+
+        try:
+            cur.execute(delete_assigned_values)
+            cur.execute(delete_assignment_values)
+            cur.execute(delete_participant_values)
+            conn.commit()
+        except Error as e:
+            print(e)
+            print("Error deleting records :( ")    
+
 
 def main():
     database = "council.db"
 
     conn = create_connection(database)
+    print("Welcome to Council Database. If this is your first time using this program, please choose option 7 before choosing option 6")
+    print("if you would like to reassign all reviewers.")
     print()
     x = 10
     while x != 0:
@@ -288,10 +322,11 @@ def main():
         print("4: Find the proposals that need to be reviewed with a given name")
         print("5: Find all open competitions that have at least one large submitted proposal(20,000 or more requested)")
         print("6: Reviewer Assignment")
+        print("7: Delete the data in Assigned")
         print()
 
         x = int(input("Please enter the number of the option you want to go to: "))
-        if x > 6:
+        if x > 7:
             print("Sorry that is an invalid number, please input a valid number between 0 and 6")
             print()
 
@@ -308,6 +343,8 @@ def main():
                 competitions_specific_month(conn)
             case 6:
                 assign_set_of_reviewers(conn)
+            case 7:
+                reset_data(conn)
     print("quitting program...")
 
 if __name__ == "__main__":
