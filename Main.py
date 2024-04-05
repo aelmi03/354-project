@@ -185,7 +185,7 @@ def proposals_by_name(conn):
     with conn:
         cur = conn.cursor()
         name_query = """
-            SELECT Grant_Proposals.grant_proposal_ID, Grants.title FROM Reviewers 
+            SELECT Reviewers.first_name, Reviewers.last_name, Grant_Proposals.grant_proposal_ID, Grants.title FROM Reviewers 
             JOIN Assigned ON Reviewers.reviewer_ID = Assigned.reviewer_ID JOIN Assignment ON Assigned.assignment_ID = Assignment.assignment_ID
             JOIN Grant_Proposals ON Assignment.grant_proposal_ID = Grant_Proposals.grant_proposal_ID JOIN Grants ON Grant_Proposals.competition_ID = Grants.competition_ID
             WHERE Reviewers.first_name = "{}" AND Reviewers.last_name = "{}" AND Assignment.submitted = false
