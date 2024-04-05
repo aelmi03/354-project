@@ -225,6 +225,10 @@ def assign_set_of_reviewers(conn):
             cur.execute(assignment_query)
             assignment_rows = cur.fetchone()
             conn.commit() 
+        else:
+            if(assignment_rows[4] == True):
+                print("This assignment has already been submitted")
+                return
         assignment_ID = assignment_rows[0]
         possible_reviewers_query = """
         SELECT * FROM Reviewers WHERE Reviewers.grant_applications_reviewed <= 3
