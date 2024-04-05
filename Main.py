@@ -39,7 +39,7 @@ def competitions_specific_month(conn):
     list = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
     while(month not in list):
         print("Sorry, that is not a valid month, please input a value from 01-12")
-        month = input("Enter a month (please put a 0 before the number if it is a singl digit): ")
+        month = input("Enter a month (please put a 0 before the number if it is a single digit): ")
         print()
 
     date = "2024-{}-01".format(month)
@@ -53,8 +53,8 @@ def competitions_specific_month(conn):
             SELECT 1 FROM Grant_Proposals
             WHERE Grant_Proposals.competition_ID = Grants.competition_ID
             AND (
-                Grant_Proposals.requested_amount > 20000 OR
-                (SELECT 1 FROM Collaborators WHERE Collaborators.grant_proposal_ID = Grant_Proposals.grant_proposal_ID) > 10
+               ( Grant_Proposals.requested_amount > 20000 AND Grant_Proposals.application_status= "submitted") OR
+                (SELECT COUNT(*) FROM Collaborators WHERE Collaborators.grant_proposal_ID = Grant_Proposals.grant_proposal_ID) > 10
             )
         )
         """.format(date)
