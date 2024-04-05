@@ -289,28 +289,28 @@ def check_in_rows(rows,reviewer_ID):
             return True
     return False
 
-def reset_data(conn):
-    with conn:
-        cur = conn.cursor()
-        delete_assigned_values = """ DELETE FROM Assigned """
-        delete_assignment_values = """ DELETE FROM Assignment """
-        delete_participant_values = """ DELETE FROM Participants_table """
+# def reset_data(conn):
+#     with conn:
+#         cur = conn.cursor()
+#         delete_assigned_values = """ DELETE FROM Assigned """
+#         delete_assignment_values = """ DELETE FROM Assignment """
+#         delete_participant_values = """ DELETE FROM Participants_table """
 
-        reassign_participants = """
-            INSERT INTO Participants_Table (meeting_ID, reviewer_ID)
-            VALUES (2410, 1),  (2408, 2), (2304, 3), (2416, 7134), (2411, 2863), (2401, 1238), (2311, 1342),
-            (2409, 3094),(2110, 8945),(2306, 2308); """
+#         reassign_participants = """
+#             INSERT INTO Participants_Table (meeting_ID, reviewer_ID)
+#             VALUES (2410, 1),  (2408, 2), (2304, 3), (2416, 7134), (2411, 2863), (2401, 1238), (2311, 1342),
+#             (2409, 3094),(2110, 8945),(2306, 2308); """
 
-        try:
-            cur.execute(delete_assigned_values)
-            cur.execute(delete_assignment_values)
-            cur.execute(delete_participant_values)
-            cur.execute(reassign_participants)
-            conn.commit()
-            print("Deleting data...")
-        except Error as e:
-            print(e)
-            print("Error deleting records :( ")    
+#         try:
+#             cur.execute(delete_assigned_values)
+#             cur.execute(delete_assignment_values)
+#             cur.execute(delete_participant_values)
+#             cur.execute(reassign_participants)
+#             conn.commit()
+#             print("Deleting data...")
+#         except Error as e:
+#             print(e)
+#             print("Error deleting records :( ")    
 
 
 def main():
@@ -330,7 +330,7 @@ def main():
         print("4: Find the proposals that need to be reviewed with a given name")
         print("5: Find all open competitions that have at least one large submitted proposal(20,000 or more requested)")
         print("6: Reviewer Assignment")
-        print("7: Delete the data in Assigned")
+
         print()
 
         x = int(input("Please enter the number of the option you want to go to: "))
@@ -351,8 +351,7 @@ def main():
                 competitions_specific_month(conn)
             case 6:
                 assign_set_of_reviewers(conn)
-            case 7:
-                reset_data(conn)
+
     print("quitting program...")
 
 if __name__ == "__main__":
