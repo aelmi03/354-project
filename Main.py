@@ -296,10 +296,16 @@ def reset_data(conn):
         delete_assignment_values = """ DELETE FROM Assignment """
         delete_participant_values = """ DELETE FROM Participants_table """
 
+        reassign_participants = """
+            INSERT INTO Participants_Table (meeting_ID, reviewer_ID)
+            VALUES (2410, 1),  (2408, 2), (2304, 3), (2416, 7134), (2411, 2863), (2401, 1238), (2311, 1342),
+            (2409, 3094),(2110, 8945),(2306, 2308); """
+
         try:
             cur.execute(delete_assigned_values)
             cur.execute(delete_assignment_values)
             cur.execute(delete_participant_values)
+            cur.execute(reassign_participants)
             conn.commit()
             print("Deleting data...")
         except Error as e:
